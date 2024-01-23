@@ -1,6 +1,6 @@
 ---
 title: "Lab 04 - La Quinta is Spanish for next to Denny's, Pt. 2"
-author: "Insert your name here"
+author: "Eric"
 date: "Insert date here"
 output: github_document
 ---
@@ -9,11 +9,11 @@ output: github_document
 
 ```{r load-packages, message = FALSE}
 library(tidyverse) 
-library(dsbox) 
+#library(dsbox) 
 ```
 
 ```{r load-data, message = FALSE}
-states <- read_csv("data/states.csv")
+#states <- read_csv("data/states.csv")
 ```
 
 ### Exercise 1

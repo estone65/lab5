@@ -1,17 +1,17 @@
 Lab 04 - La Quinta is Spanish for next to Denny’s, Pt. 2
 ================
-Insert your name here
+Eric
 Insert date here
 
 ### Load packages and data
 
 ``` r
 library(tidyverse) 
-library(dsbox) 
+#library(dsbox) 
 ```
 
 ``` r
-states <- read_csv("data/states.csv")
+#states <- read_csv("data/states.csv")
 ```
 
 ### Exercise 1
