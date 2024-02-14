@@ -1,7 +1,7 @@
-Lab 04 - La Quinta is Spanish for next to Denny’s, Pt. 2
+Lab 05 - La Quinta is Spanish for next to Denny’s, Pt. 2
 ================
 Eric
-Insert date here
+2.14.24
 
 ### Load packages and data
 
