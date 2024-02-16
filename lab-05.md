@@ -48,6 +48,8 @@ There are 3 Alaska Dennys locations and 2 Alaska Laquinta locations.
 > locations in Alaska, i.e., how many distances do we need to calculate
 > between the locations of these establishments in Alaska?
 
+There are 6 total (2x3 = 6)
+
 ``` r
 dn_lq_ak <- full_join(dn_ak, lq_ak, by = "state")
 ```
@@ -74,7 +76,7 @@ dn_lq_ak
     ## # ℹ 2 more variables: longitude.y <dbl>, latitude.y <dbl>
 
 This combined the two data sets. Note each observation is no longer
-either dennys or laquinta establishments, but both are down twice. The
+either dennys or laquinta establishments, but contains both of them. The
 first two locations are Dennys \#1, the next two Denny’s \#2, etc. Rows
 1, 3, and 5 are the first Laquinta location, and rows 2, 4, and 6 are
 the second Laquinta location.
@@ -226,12 +228,12 @@ histogram, which turned out to be much harder than I expected it to be.
 I ended up constructing the following, with the help of ChatGPT. It
 seems like there has to be an easier way. Leaving open the question of
 whether a grouped histogram is a good graphical choice, I’d like to
-discuss if there’s an easier way to make one Everything I tried had some
-issues, which then had work-arounds, which produced more issues (e.g.,
-when recoding, it then used those as labels, so that needed to be redone
-… but then I (think) it wasn’t considering distance as a continuous
-variable, so left off situations were n was 0, so that needed to be
-fixed). Anyway, i’m glad I got it to work, but it would be worth
+discuss if there’s an easier way to make one. Everything I tried had
+some issues, which then had work-arounds, which produced more issues
+(e.g., when recoding, it then used those as labels, so that needed to be
+redone … but then I (think) it wasn’t considering distance as a
+continuous variable, so left off situations were n was 0, so that needed
+to be fixed). Anyway, i’m glad I got it to work, but it would be worth
 discussing if there’s a better choice for producing this type of
 histogram.
 
@@ -351,7 +353,7 @@ central tendency. Seems to still be a bit of positive skew. (As an
 aside, I tried to compute the skewness statistic, but couldn’t figure
 out how to.)
 
-### Exercise 12
+### Exercise 11
 
 > Repeat the same analysis for a state of your choosing, different than
 > the ones we covered so far.
@@ -419,7 +421,7 @@ dn_lq_ct_mindist_complete <- dn_lq_ct_mindist %>%
 ggplot(dn_lq_ct_mindist_complete, aes(x = closest_grouped, y=n)) + 
   geom_bar(stat="identity") +
   labs(
-    title = "Minimum Distance between Dennys and Laquinta in Delaware",
+    title = "Minimum Distance between Dennys and Laquinta in Connecticut",
     x = "minimum distance (Haversine)", y = "Count"
   )
 ```
@@ -428,3 +430,88 @@ ggplot(dn_lq_ct_mindist_complete, aes(x = closest_grouped, y=n)) +
 
 So, despite being a much smaller state, they are still (on average) more
 spread out in Connecticut than in Texas.
+
+### Exercise 12
+
+> Among the states you examined, where is Mitch Hedberg’s joke most
+> likely to hold true? Explain your reasoning.
+
+The obvious answer to this question is Texas. And in this case, the
+difference is so striking that I think the obvious answer is the correct
+one. Nonetheless, there are at least 3 factors that make this issue more
+complicated than just looking at average minimum distance: (1) some
+states are smaller than others, so it is more likely to have
+establishments together just by chance, (2) some states have more dennys
+and laquintas than others do, and (3) some states have more restaurants
+and hotels than others do. The more I thought about it, the more I think
+it’s not even fully clear what the joke means. I’ve been interpreting it
+as if you see a dennys, there has to be a laquinta nearby –\> but it has
+to also mean that it’s not as likely to see other hotels. If you see a
+laquinta, a marriott, and hilton, and 30 other hotels, the joke isn’t
+very funny. So I think evaluating this question is much harder than it
+might seem at first. Nonetheless, I’m going to take a stab at
+controlling for area, at least. It’s far from the ideal solution, but it
+may help a little, and it will be good practice. I’m not going to bother
+with graphs, but just compute summary statistics since it’s getting
+late.
+
+Step 1: Add the state information back into the relevant data frames.
+I’ll need this later. (Note: It seems like there has to be a way to add
+the variable to the existing data frame, but whenever I try to do that
+it goes away for subsequent analyses.)
+
+``` r
+dn_lq_nc_mindist2 <-  dn_lq_nc_mindist %>%
+   mutate(abbreviation = "NC")
+dn_lq_tx_mindist2 <- dn_lq_tx_mindist %>%
+   mutate(abbreviation = "TX")
+dn_lq_ct_mindist2 <- dn_lq_ct_mindist %>%
+   mutate(abbreviation = "CT")
+```
+
+Step 2: Create one big data frame with all 3 states.
+
+``` r
+dn_lq_all_mindist <- bind_rows(dn_lq_nc_mindist2, dn_lq_tx_mindist2, dn_lq_ct_mindist2)
+```
+
+Step 3: Add “area” from the states data set.
+
+``` r
+dn_lq_all_mindist_with_area <- dn_lq_all_mindist %>%
+  left_join(states %>% select(abbreviation, area), by = "abbreviation")
+```
+
+``` r
+options(scipen = 999)
+```
+
+Step 4: Compute “relative minimum distance” (minimum distance per area),
+and then multiplying by 100,000 to get on an easier scale.
+
+``` r
+my_data_frame_names_are_too_long <- dn_lq_all_mindist_with_area %>%
+  mutate (rel_min_distance = (closest / area) * 100000)
+```
+
+Step 5: Compute summary statistics for each of the states.
+
+``` r
+my_data_frame_names_are_too_long %>%
+  group_by(abbreviation) %>%
+  summarise(mean = mean(rel_min_distance), median = median(rel_min_distance), sd = sd(rel_min_distance))
+```
+
+    ## # A tibble: 3 × 4
+    ##   abbreviation   mean median     sd
+    ##   <chr>         <dbl>  <dbl>  <dbl>
+    ## 1 CT           384.   388.   237.  
+    ## 2 NC           122.    99.3   99.3 
+    ## 3 TX             2.16   1.26   3.29
+
+Yet again, Texas is clearly the winner. However … in the initial
+analysis, it looked like Connecticut was second, and the joke applied
+the least to North Carolina. This analysis, however, shows that
+conclusion is probably false, that Connecticut having the second
+smallest mean was likely just a function of its being a much smaller
+state.
