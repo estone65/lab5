@@ -88,9 +88,13 @@ The ability to create functions is very nice!
 > Calculate the distances between all pairs of Denny’s and La Quinta locations and save this variable as distance. Make sure to save this variable in THE dn_lq_ak data frame so that you can use it later.
 
 ```{r calculating distance, message = FALSE}
-dn_lq_ak_distance <- dn_lq_ak %>%
-   mutate(distance = haversine (longitude.x, latitude.x, longitude.y, latitude.y, round = 3))
+# dn_lq_ak_distance <- dn_lq_ak %>%
+#   mutate(distance = haversine (longitude.x, latitude.x, longitude.y, latitude.y, round = 3))
+dn_lq_ak <-
+   mutate(.data=dn_lq_ak, distance = haversine (longitude.x, latitude.x, longitude.y, latitude.y, round = 3))
 ```
+
+
 
 Done. I saved it as a new data frame because I wasn't sure how to save it in the previous data frame, and I'm worried about unintentionally making changes to the original data frame.
 
